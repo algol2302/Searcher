@@ -1,0 +1,124 @@
+﻿The Searcher 
+Python Test Task
+
+
+Description	1
+Command signature	1
+Required features	2
+Сriterion of Assessment	4
+
+Description
+You need to implement a console application, which can filter (and collect some
+ statistic) text input (file or stdin) using a regular expression
+
+Mandatory Requirement
+
+Application must be implemented using Python 3 standard libraries only (no the 
+3rd party libraries or Linux commands like uniq, sort, grep and etc) for 
+business logic implementation. But you can use the 3rd party library click 
+http://click.pocoo.org/5/ instead of argparse for handling command line 
+parameters.
+We consider that regular expression does not contains \r or \n symbols.
+Command signature
+
+command [OPTIONS] PATTERN [FILENAME]
+
+>>> ./searcher.py “\w+@\w+”  mytext.txt
+
+OR
+
+>>> cat mytext.txt | ./searcher.py “\w+@\w+” 
+
+Required features
+Warning! 
+Examples of a console command calling is for a clarification only. You can 
+change named parameters, the command name and format of the output at your 
+own discretion.
+
+List all found matches
+
+>>> ./searcher.py “\w+@[\w.-_]+”  mytext.txt
+
+List unique matches only
+
+>>> ./searcher.py -u “\w+@[\w.-_]+”  mytext.txt
+
+Get total count of found matches
+
+>>> ./searcher.py -c “\w+@[\w.-_]+”  mytext.txt
+	
+Get total count of unique matches
+	
+>>> ./searcher.py -c -u “\w+@[\w.-_]+”  mytext.txt
+	
+Get total count of lines, where at least one match was found
+	
+>>> ./searcher.py -l “\w+@[\w.-_]+”  mytext.txt
+
+Sorting of found matches by alphabet and frequency (related to all found 
+matches). Default sorting is “abc”.
+	
+>>> ./searcher.py -s freq “\w+@[\w.-_]+”  mytext.txt
+>>> ./searcher.py -s abc “\w+@[\w.-_]+”  mytext.txt
+
+Sorting order can be specified (ascending, descending). Default order is “asc”.
+	
+>>> ./searcher.py -o asc “\w+@[\w.-_]+”  mytext.txt
+>>> ./searcher.py -o desc “\w+@[\w.-_]+”  mytext.txt
+	
+List first N matches
+
+>>> ./searcher.py -n 3 “\w+@[\w.-_]+”  mytext.txt
+
+List unique matches with statistic (count or frequency in percents). Sorting 
+options can be applied, too. As well as filter “first N matches”.
+
+>>> ./searcher.py --stat count “\w+@[\w.-_]+”  mytext.txt
+Substr			| Count
+vitae@rome.it		| 2 
+semper@omes.it		| 1
+semper@domain.it		| 1
+
+>>> ./searcher.py --stat freq “\w+@[\w.-_]+”  mytext.txt
+Substr			| Freq
+vitae@rome.it		| 0.333
+semper@rome.it		| 0.167
+semper@domain.it		| 0.167
+
+Frequency should be calculated in this way:
+
+Freq(i) = Mi / N, 
+where M - count of the i-th matching string, N - total count of all found 
+matches.
+
+A regular expression must allow to specify one matching group and use it in 
+output and statistic calculation
+
+# find frequency of domains in emails in text file
+# \w+@([\w.-_]+) - a very simple pattern for emails (just for example)
+>>> ./searcher.py --stat freq “\w+@([\w.-_]+)”  mytext.txt
+Substr	| Freq
+rome.it	| 0.667
+domain.it	| 0.333
+
+Display a short help information
+
+>>> ./searcher.py --help
+
+searcher.py [OPTIONS] PATTERN [FILENAME]
+
+Parameters description
+...
+
+Сriterion of Assessment
+All requirements are implemented as specified
+Readability (pep8)
+The adequacy of code complexity
+Usage of Python 3 standard library
+Code comments and docstrings
+Error handling. If user see tracebacks it’s not very nice.
+Code is placed on GitHub (public repository)
+Tests (optional, but a very very big plus)
+
+etstetssetsetset,vitae@rome.it,setset
+vitae@rome.it		| 2  vitae@rome.it		| 2 
