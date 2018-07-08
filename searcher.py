@@ -82,13 +82,10 @@ class Searcher():
 			
 				counts = collections.Counter(self.result)
 				res = list(counts)
-			
+	
 				# For frequency in options
 				N = len(flat_result)
-				freq = dict(counts)
-				for i,k in counts.items():
-					freq[i] = round(float(k) / N, 3)
-
+		
 				if result is None:
 					print("There aren't any matches.")
 			else:
@@ -101,7 +98,8 @@ class Searcher():
 				for key, value in sorted(self.options.dictionary.items(), \
 				reverse=True):
 					if value:
-						print("There are options: {} : {}".format(key, value))
+						# Uncomment next string for printing out options taking into accout
+						# print("There are options: {} : {}".format(key, value))
 						# Python analog of switch - case operators
 						if key is 'unique':
 							self.result = list(set(flat_result))
@@ -112,29 +110,32 @@ class Searcher():
 						elif key == 'sort' and value == 'abc':
 							self.result = sorted(self.result)
 						elif key == 'sort' and value == 'freq':
-							self.result = sorted(self.result, key=lambda x: \
-								counts[x]
+							self.result = sorted(self.result, 
+								key=lambda pair: pair[1]
 							)
+							# counts.most_common()
+							# sorted(counts.items(), key=counts.get)
 						elif key == 'order' and value == 'asc':
 							pass
+							# self.result = sorted(self.result, key=lambda pair: pair[1])
 						elif key == 'order' and value == 'desc':
 							self.result = self.result[::-1]
 						elif key is 'number':
 							self.result = self.result[0:int(value)]
 						elif key == 'stat' and value == 'count':
-							self.result = sorted(counts.items(), key=lambda x: \
-								counts[x]
-							)
+							for i, k in enumerate(counts.items()):
+								res[i] = k
+							self.result = res
 						elif key == 'stat' and value == 'freq':
-							tabs = "\t\t| "
-							for i, k in enumerate(sorted(counts.items())):
-								res[i] = str(k[0]) + tabs + str(k[1])
+							for i, k in enumerate(counts.items()):
+								res[i] = (k[0], round(k[1]/N, 3))
 							self.result = res
 						else:
 							self.error \
 								="This options {}: {}".format(key, value) \
 								+ " doesn't exist."
 
+	# This function print out main result
 	def print_result(self):
 		if self.error:
 			print(self.error)
@@ -144,10 +145,18 @@ class Searcher():
 			except TypeError:
 				print(self.result)
 			else:
-				if isinstance(self.result, dict):
-					print(self.result)	
-				elif isinstance(self.result, list):
-					print(self.result)	
+				if isinstance(self.result[0], tuple) and isinstance(
+						self.result[0][1], int
+					):
+					print('Substr\t| Count')
+					for i in self.result:
+						print(str(i[0]) +'\t| ' + str(i[1]))
+				elif isinstance(self.result[0], tuple) and isinstance(
+						self.result[0][1], float
+					):
+					print('Substr\t\t| Freq')
+					for i in self.result:
+						print(str(i[0]) +'\t| ' + str(i[1]))
 				else:
 					for i in self.result:
 						print(i)
@@ -158,24 +167,27 @@ class Searcher():
 matches')
 @click.option('--lines', '-l', is_flag=True, help='Get total count of lines, \
 where at least one match was found')
-@click.option('--sort', '-s', default='abc', help='Sorting of found matches \
-by alphabet and frequency (related to all found matches).')
-@click.option('--order', '-o', default='asc', help='Sorting order can be \
-specified (ascending, descending).')
-@click.option('--number', '-n', help='List first N matches')
-@click.option('--stat', help='List unique matches with statistic (count or \
-frequency in percents)')
+@click.option('--sort', '-s', default='abc', help='''Sorting of found matches \
+by alphabet and frequency (related to all found matches). Default sorting is “abc”.\n
+$./searcher.py -s freq “\w+@[\w.-_]+” mytext.txt\n
+$./searcher.py -s abc “\w+@[\w.-_]+” mytext.txt\n
+''')
+@click.option('--order', '-o', default='asc', help='''Sorting order can be
+specified (ascending, descending). Default order is “asc”.\n
+$./searcher.py -o asc “\w+@[\w.-_]+” mytext.txt\n
+$./searcher.py -o desc “\w+@[\w.-_]+” mytext.txt\n''')
+@click.option('--number', '-n', help='''List first N matches\n
+$./searcher.py -n 3 “\w+@[\w.-_]+” mytext.txt''')
+@click.option('--stat', help='''List unique matches with statistic (count or \
+frequency in percentage.\n$./searcher.py --stat count “\w+@[\w.-_]+”  mytext.txt)\n
+$./searcher.py --stat freq “\w+@[\w.-_]+”  mytext.txt''')
 @click.argument('pattern', required=True)
 @click.argument('filename', type=click.File('r'), required=False)
 def searcher(unique, count, lines, sort, order, number, stat, pattern, filename):
-
-	# print(filename)
-	# print(pattern)
-	# There we forms options as dictionary
 	options = {'unique': unique, 'count': count, 'lines': lines, 'sort': sort,\
 		'order': order, 'number': number, 'stat': stat
 	}
-
+	# We declare main instances
 	options_instance = Options(options)
 	pattern_instance = Pattern(pattern)
 	filename_instance = Filename(filename)
@@ -183,7 +195,7 @@ def searcher(unique, count, lines, sort, order, number, stat, pattern, filename)
 	searcher_instance = Searcher(options_instance, pattern_instance, \
 		filename_instance
 	)
-	
+	# We print main result
 	searcher_instance.print_result()
 
 
