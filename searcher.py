@@ -98,8 +98,10 @@ class Searcher():
 				for key, value in sorted(self.options.dictionary.items(), \
 				reverse=True):
 					if value:
+						
 						# Uncomment next string for printing out options taking into accout
 						# print("There are options: {} : {}".format(key, value))
+
 						# Python analog of switch - case operators
 						if key is 'unique':
 							self.result = list(set(flat_result))
@@ -113,11 +115,8 @@ class Searcher():
 							self.result = sorted(self.result, 
 								key=lambda pair: pair[1]
 							)
-							# counts.most_common()
-							# sorted(counts.items(), key=counts.get)
 						elif key == 'order' and value == 'asc':
-							pass
-							# self.result = sorted(self.result, key=lambda pair: pair[1])
+							pass #
 						elif key == 'order' and value == 'desc':
 							self.result = self.result[::-1]
 						elif key is 'number':
